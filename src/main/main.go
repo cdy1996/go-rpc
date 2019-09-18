@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"net"
+	"rpc/src/main/rpc"
 	"time"
 )
 
@@ -38,10 +39,10 @@ func main() {
 	// new Type needs to be registered
 	gob.Register(User{})
 	addr := "localhost:3212"
-	srv := NewServer(addr)
+	srv := rpc.NewServer(addr)
 	// start server
 	srv.Register("QueryUser", QueryUser)
-	go srv.Run()
+	go srv.Start()
 	// wait for server to start.
 	time.Sleep(1 * time.Second)
 	// start client
@@ -49,9 +50,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cli := NewClient(conn)
+	cli := rpc.NewClient(conn)
+
+	//模拟接口
 	var Query func(int) (User, error)
-	cli.callRPC("QueryUser", &Query)
+	cli.CallRPC("QueryUser", &Query)
 	u, err := Query(1)
 	if err != nil {
 		panic(err)

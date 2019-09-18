@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 )
 
-// be sent over the network.
+// 编码
 func Encode(data RPCdata) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
@@ -15,13 +15,13 @@ func Encode(data RPCdata) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// Decode the binary data into the Go struct
+//解码
 func Decode(b []byte) (RPCdata, error) {
 	buf := bytes.NewBuffer(b)
 	decoder := gob.NewDecoder(buf)
 	var data RPCdata
 	if err := decoder.Decode(&data); err != nil {
-		return Data{}, err
+		return RPCdata{}, err
 	}
 	return data, nil
 }

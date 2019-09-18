@@ -10,8 +10,17 @@ type Client struct {
 	conn net.Conn
 }
 
-func (c *Client) callRPC(rpcName string, fPtr interface{}) {
+func NewClient(conn net.Conn) *Client {
+	return &Client{
+		conn: conn,
+	}
+
+}
+
+func (c *Client) CallRPC(rpcName string, fPtr interface{}) {
 	container := reflect.ValueOf(fPtr).Elem()
+
+	// 回调方法
 	f := func(req []reflect.Value) []reflect.Value {
 		cReqTransport := NewTransport(c.conn)
 		errorHandler := func(err error) []reflect.Value {

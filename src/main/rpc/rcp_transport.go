@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-// Transport will use TLV protocol
+// 定长传输协议
 type Transport struct {
 	conn net.Conn // Conn is a generic stream-oriented network connection.
 }

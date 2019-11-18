@@ -13,6 +13,7 @@ type RPCServer struct {
 	funcs  map[string]reflect.Value
 	listen net.Listener
 	close  bool
+	coder  Coder
 }
 
 func NewServer(addr string) *RPCServer {
@@ -20,6 +21,7 @@ func NewServer(addr string) *RPCServer {
 		addr:  addr,
 		funcs: make(map[string]reflect.Value),
 		close: false,
+		coder: &DefaultCoder{},
 	}
 	listener, e := net.Listen("tcp", server.addr)
 	if e != nil {
@@ -46,13 +48,13 @@ func (self *RPCServer) Response(conn net.Conn) {
 		if e != nil {
 			return
 		}
-		cdata, e := Decode(read)
+		cdata, e := self.coder.Decode(read)
 		if e != nil {
 			panic(e)
 		}
 		result := self.Execute(cdata)
 
-		encode, e := Encode(result)
+		encode, e := self.coder.Encode(result)
 		if e != nil {
 			return
 		}

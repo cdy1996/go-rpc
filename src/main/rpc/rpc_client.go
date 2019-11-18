@@ -7,12 +7,14 @@ import (
 )
 
 type Client struct {
-	conn net.Conn
+	conn  net.Conn
+	coder Coder
 }
 
 func NewClient(conn net.Conn) *Client {
 	return &Client{
-		conn: conn,
+		conn:  conn,
+		coder: &DefaultCoder{},
 	}
 
 }
@@ -38,7 +40,7 @@ func (c *Client) CallRPC(rpcName string, fPtr interface{}) {
 		}
 		// ReqRPC
 		reqRPC := RPCdata{Name: rpcName, Args: inArgs}
-		b, err := Encode(reqRPC)
+		b, err := c.coder.Encode(reqRPC)
 		if err != nil {
 			panic(err)
 		}
@@ -51,7 +53,7 @@ func (c *Client) CallRPC(rpcName string, fPtr interface{}) {
 		if err != nil { // local network error or decode error
 			return errorHandler(err)
 		}
-		rspDecode, _ := Decode(rsp)
+		rspDecode, _ := c.coder.Decode(rsp)
 		if rspDecode.Err != "" { // remote server error
 			return errorHandler(errors.New(rspDecode.Err))
 		}

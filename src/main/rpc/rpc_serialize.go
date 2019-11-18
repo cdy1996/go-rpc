@@ -5,8 +5,16 @@ import (
 	"encoding/gob"
 )
 
+type Coder interface {
+	Encode(data RPCdata) ([]byte, error)
+	Decode(b []byte) (RPCdata, error)
+}
+
+type DefaultCoder struct {
+}
+
 // 编码
-func Encode(data RPCdata) ([]byte, error) {
+func (self *DefaultCoder) Encode(data RPCdata) ([]byte, error) {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
 	if err := encoder.Encode(data); err != nil {
@@ -16,7 +24,7 @@ func Encode(data RPCdata) ([]byte, error) {
 }
 
 //解码
-func Decode(b []byte) (RPCdata, error) {
+func (self *DefaultCoder) Decode(b []byte) (RPCdata, error) {
 	buf := bytes.NewBuffer(b)
 	decoder := gob.NewDecoder(buf)
 	var data RPCdata
